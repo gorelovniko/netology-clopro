@@ -10,7 +10,7 @@ terraform apply
 
 ![](./img/2.png)
 
-[network](./terraform/network.tf)
+[network](./terraform/network.tf)  
 [instance](./terraform/main.tf)
 
 ![](./img/3.png)  
