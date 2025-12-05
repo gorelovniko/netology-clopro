@@ -1,6 +1,6 @@
 # VPC
 resource "yandex_vpc_network" "vpc" {
-  name = "homework-vpc"
+  name = "netology-hw-vpc"
 }
 
 # Public subnet
