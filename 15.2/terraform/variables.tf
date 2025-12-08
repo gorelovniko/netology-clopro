@@ -1,28 +1,18 @@
-# variable "yc_token" {}
-# variable "yc_cloud_id" {}
-# variable "yc_folder_id" {}
-# variable "yc_zone" {
-#   default = "ru-central1-a"
-# }
-
 #=============================== Переменные =================================
+
 
 #-------------------------------== ID Облака ==------------------------------
 variable "yc_cloud_id" {
   description = "Yandex Cloud ID"
   type        = string
-
-  # Перед git push удалить
-  default     = "b1g51144vtfee9bo6o2e"
-}
+  # default     = ''
+ }
 
 #---------------------== ID папки, где будут создаваться ВМ ==---------------
 variable "yc_folder_id" { # 
   description = "Yandex Cloud Folder ID"
   type        = string
-  
-  # Перед git push удалить
-  default     = "b1g08evp9r1vatdqt3nv"
+  # default     = ''
 }
 
 #-------------------------== Зона сети по умолчанию ==-----------------------
@@ -34,11 +24,6 @@ variable "yc_zone" {
 
 #-----------------------== ID образа ОС по умолчанию ==----------------------
 variable "yc_image_id" {
-<<<<<<< HEAD
   description = "Yandex Cloud default image"
-  default     = "fd80mrhj8fl2oe87o4e1"
-=======
-  description = "Debian 12 Yandex Cloud default image"
   default     = "fd8djec02sfvs6t3ojng"
->>>>>>> 141c4c9 (HW-15.2 v.0.1)
 }
