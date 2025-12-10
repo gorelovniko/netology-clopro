@@ -16,3 +16,17 @@ cloud-init.yml
 nimda@*
 variables.tf.myexample
 .env
+
+# Local files
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+plan.out
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
