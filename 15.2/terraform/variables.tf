@@ -27,3 +27,25 @@ variable "yc_image_id" {
   description = "Yandex Cloud default image"
   default     = "fd8djec02sfvs6t3ojng"
 }
+
+
+# Bucket
+
+variable "bucket_name" {
+  description = "Bucket name for images"
+  type        = string
+  default     = "student-bucket-2025"
+}
+
+variable "image_file_path" {
+  description = "Path to image file"
+  type        = string
+  default     = "./science.png"
+}
+
+variable "zone" {
+  description = "Zone"
+  type        = string
+  default     = "ru-central1-a"
+}
+
