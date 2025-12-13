@@ -1,4 +1,3 @@
-
 # Создание шаблона ВМ
 resource "yandex_compute_instance_group" "lamp_group" {
   name               = "lamp-instance-group"
@@ -23,12 +22,15 @@ resource "yandex_compute_instance_group" "lamp_group" {
     
     network_interface {
       network_id = yandex_vpc_network.network.id
-      subnet_ids = [yandex_vpc_subnet.subnet.id]
+      # subnet_ids = [
+      #   yandex_vpc_subnet.subnet_a.id,  # ru-central1-a
+      #   yandex_vpc_subnet.subnet_b.id,  # ru-central1-b  
+      #   yandex_vpc_subnet.subnet_d.id   # ru-central1-d
+      # ]
       nat        = true
     }
     
     metadata = {
-      # ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
       user-data          = file("./cloud-init.yml")
       user-data = <<-EOF
         #cloud-config
@@ -57,7 +59,7 @@ resource "yandex_compute_instance_group" "lamp_group" {
             <head>
                 <meta charset=\"UTF-8\">
                 <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
-                <title>Yandex Cloud Assignment</title>
+                <title>GorelovNN Netology</title>
                 <style>
                     body {
                         font-family: Arial, sans-serif;
@@ -105,15 +107,21 @@ resource "yandex_compute_instance_group" "lamp_group" {
             </head>
             <body>
                 <div class=\"container\">
-                    <h1>Yandex Cloud Assignment - LAMP Instance</h1>
+                    <h1>LAMP Instance - GorelovNN Netology</h1>
                     
                     <div class=\"info\">
                         <p><strong>Instance ID:</strong> $(hostname)</p>
                         <p><strong>Zone:</strong> ${var.zone}</p>
                         <p><strong>Image:</strong> LAMP Stack (Ubuntu + Apache + MySQL + PHP)</p>
                     </div>
+                    <div class=\"metadata\">
+                        <h4>Instance Metadata:</h4>
+                        <p>Generated: $(date)</p>
+                        <p>Internal IP: $(hostname -I | awk '{print \$1}')</p>
+                        <p>Public IP: $(curl -s ifconfig.me)</p>
+                    </div>
                     
-                    <h2>Image from Object Storage</h2>
+                    <h2>Картинка из bucket</h2>
                     <div class=\"image-container\">
                         <a href=\"https://${yandex_storage_bucket.student_bucket.bucket}.storage.yandexcloud.net/${yandex_storage_object.website_image.key}\" target=\"_blank\">
                             <img src=\"https://${yandex_storage_bucket.student_bucket.bucket}.storage.yandexcloud.net/${yandex_storage_object.website_image.key}\" 
@@ -127,19 +135,6 @@ resource "yandex_compute_instance_group" "lamp_group" {
                         <p><strong>Bucket Name:</strong> ${yandex_storage_bucket.student_bucket.bucket}</p>
                         <p><strong>File Name:</strong> ${yandex_storage_object.website_image.key}</p>
                         <p><strong>Direct URL:</strong> https://${yandex_storage_bucket.student_bucket.bucket}.storage.yandexcloud.net/${yandex_storage_object.website_image.key}</p>
-                    </div>
-                    
-                    <h3>Useful Links:</h3>
-                    <ul>
-                        <li><a href=\"/phpinfo.php\">PHP Info</a></li>
-                        <li><a href=\"/phpmyadmin\" target=\"_blank\">phpMyAdmin (if installed)</a></li>
-                    </ul>
-                    
-                    <div class=\"metadata\">
-                        <h4>Instance Metadata:</h4>
-                        <p>Generated: $(date)</p>
-                        <p>Internal IP: $(hostname -I | awk '{print \$1}')</p>
-                        <p>Public IP: $(curl -s ifconfig.me)</p>
                     </div>
                 </div>
             </body>
@@ -172,15 +167,7 @@ resource "yandex_compute_instance_group" "lamp_group" {
   }
   
 
-  # #   # === ДОБАВЬТЕ ЭТОТ БЛОК ===
-  # load_balancer {
-  #   target_group_name        = "lamp-target-group" # Имя для автоматически создаваемой целевой группы
-  #   target_group_description = "Target group for LAMP instance group"
-  # }
-  # # # =========================
-
-
-  # Настройка проверки состояния
+ # Настройка проверки состояния
   health_check {
     interval            = 5
     timeout             = 3
@@ -195,6 +182,6 @@ resource "yandex_compute_instance_group" "lamp_group" {
   
   depends_on = [
     yandex_storage_object.website_image,
-    yandex_vpc_subnet.subnet
+    yandex_vpc_subnet.subnet_a
   ]
 }

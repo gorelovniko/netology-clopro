@@ -1,45 +1,50 @@
-# Создание бакета Object Storage
-resource "yandex_storage_bucket" "student_bucket" {
-  # access_key = yandex_iam_service_account_static_access_key.bucket-sa-key.access_key
-  # secret_key = yandex_iam_service_account_static_access_key.bucket-sa-key.secret_key
+# locals {
+#   # Получаем текущую дату автоматически
+#   timestamp = formatdate("YYYY-MM-DD", timestamp())
   
-  bucket     = var.bucket_name
-  folder_id = var.yc_folder_id
-  # acl        = "public-read"
+#   # Или с точностью до секунды
+#   timestamp_full = formatdate("YYYY-MM-DD-hh-mm-ss", timestamp())
   
-  # website {
-  #   index_document = "index.html"
-  #   error_document = "error.html"
-  # }
+#   # Используем переданное значение или текущую дату
+#   current_date = var.current_date != "" ? var.current_date : local.timestamp
+# }
+data "external" "current_date" {
+  program = ["bash", "-c", "echo '{\"date\": \"'$(date '${var.date_format}')'\"}'"]
 }
 
+locals {
+  current_date = data.external.current_date.result.date
+}
 
+# Создание бакета Object Storage
+resource "yandex_storage_bucket" "student_bucket" {
 
-# resource "yandex_storage_bucket_iam_member" "admin_for_sa" {
-#   bucket = yandex_storage_bucket.student_bucket.bucket
-#   role   = "storage.admin"
-#   member = "serviceAccount:${yandex_iam_service_account.bucket-sa.id}"
-# }
+  bucket     = "${var.bucket_name}-${local.current_date}"
+  folder_id = var.yc_folder_id
 
-# 2. Делаем бакет (или конкретные объекты) публичными через IAM.
-# Этот блок дает право ВСЕМ пользователям ('allUsers') читать объекты бакета.
-# resource "yandex_storage_bucket_iam_member" "public_read" {
-#   bucket = yandex_storage_bucket.student_bucket.bucket
-#   role   = "storage.viewer"
-#   member = "system:allUsers" # Ключевой момент: доступ для всех в интернете
-# }
+}
+
+resource "yandex_storage_bucket_iam_binding" "bucket-full-access" {
+  bucket = yandex_storage_bucket.student_bucket.id
+  role   = "storage.editor"  # Можно использовать storage.admin для полного контроля
+  
+  members = [
+    "serviceAccount:${yandex_iam_service_account.bucket-sa.id}",
+  ]
+}
 
 # Загрузка картинки в бакет
 resource "yandex_storage_object" "website_image" {
-  access_key = yandex_iam_service_account_static_access_key.bucket-sa-key.access_key
-  secret_key = yandex_iam_service_account_static_access_key.bucket-sa-key.secret_key
-  
   bucket = yandex_storage_bucket.student_bucket.bucket
   key    = "image.png"
   source = var.image_file_path
   acl    = "public-read"
-  
+
+  access_key = yandex_iam_service_account_static_access_key.bucket-sa-key.access_key
+  secret_key = yandex_iam_service_account_static_access_key.bucket-sa-key.secret_key
+
   depends_on = [
-    yandex_storage_bucket.student_bucket
+    yandex_storage_bucket.student_bucket,
+    yandex_storage_bucket_iam_binding.bucket-full-access,
   ]
 }

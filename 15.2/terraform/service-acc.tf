@@ -18,14 +18,13 @@ resource "yandex_iam_service_account_static_access_key" "bucket-sa-key" {
   description        = "Static access key for Object Storage"
 }
 
+#--------------------------vm-editor
 
 # Создание сервисного аккаунта для ВМ
 resource "yandex_iam_service_account" "vm-sa" {
   name        = "vm-service-account"
   description = "Service account for VMs"
 }
-
-#--------------------------vm-editor
 
 # Назначение ролей сервисному аккаунту ВМ
 resource "yandex_resourcemanager_folder_iam_member" "vm-editor" {
