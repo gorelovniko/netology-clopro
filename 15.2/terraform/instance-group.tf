@@ -1,24 +1,6 @@
-# Создание сервисного аккаунта для ВМ
-resource "yandex_iam_service_account" "vm-sa" {
-  name        = "vm-service-account"
-  description = "Service account for VMs"
-}
-
-# Назначение ролей сервисному аккаунту ВМ
-resource "yandex_resourcemanager_folder_iam_member" "vm-editor" {
-  folder_id = var.yc_folder_id
-  role      = "editor"
-  member    = "serviceAccount:${yandex_iam_service_account.vm-sa.id}"
-}
-
-resource "yandex_resourcemanager_folder_iam_member" "vpc-user" {
-  folder_id = var.yc_folder_id
-  role      = "vpc.user"
-  member    = "serviceAccount:${yandex_iam_service_account.vm-sa.id}"
-}
 
 # Создание шаблона ВМ
-resource "yandex_compute_instance_group" "lamp-group" {
+resource "yandex_compute_instance_group" "lamp_group" {
   name               = "lamp-instance-group"
   folder_id          = var.yc_folder_id
   service_account_id = yandex_iam_service_account.vm-sa.id
@@ -66,13 +48,15 @@ resource "yandex_compute_instance_group" "lamp-group" {
           - systemctl enable mysql
           - systemctl start mysql
           - echo "<?php phpinfo(); ?>" > /var/www/html/phpinfo.php
+          # Здесь критически важно создать файл через HERE-doc в оболочке, а не в cloud-config
+          # Используем 'sh -c' для правильного выполнения сложной команды
           - |
-            cat > /var/www/html/index.html <<'EOL'
+            sh -c "cat > /var/www/html/index.html <<'EOL'
             <!DOCTYPE html>
-            <html lang="en">
+            <html lang=\"en\">
             <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <meta charset=\"UTF-8\">
+                <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
                 <title>Yandex Cloud Assignment</title>
                 <style>
                     body {
@@ -120,25 +104,25 @@ resource "yandex_compute_instance_group" "lamp-group" {
                 </style>
             </head>
             <body>
-                <div class="container">
+                <div class=\"container\">
                     <h1>Yandex Cloud Assignment - LAMP Instance</h1>
                     
-                    <div class="info">
+                    <div class=\"info\">
                         <p><strong>Instance ID:</strong> $(hostname)</p>
                         <p><strong>Zone:</strong> ${var.zone}</p>
                         <p><strong>Image:</strong> LAMP Stack (Ubuntu + Apache + MySQL + PHP)</p>
                     </div>
                     
                     <h2>Image from Object Storage</h2>
-                    <div class="image-container">
-                        <a href="https://${yandex_storage_bucket.student_bucket.bucket}.storage.yandexcloud.net/${yandex_storage_object.website_image.key}" target="_blank">
-                            <img src="https://${yandex_storage_bucket.student_bucket.bucket}.storage.yandexcloud.net/${yandex_storage_object.website_image.key}" 
-                                 alt="Image from Yandex Object Storage">
+                    <div class=\"image-container\">
+                        <a href=\"https://${yandex_storage_bucket.student_bucket.bucket}.storage.yandexcloud.net/${yandex_storage_object.website_image.key}\" target=\"_blank\">
+                            <img src=\"https://${yandex_storage_bucket.student_bucket.bucket}.storage.yandexcloud.net/${yandex_storage_object.website_image.key}\" 
+                                 alt=\"Image from Yandex Object Storage\">
                         </a>
                         <p>Click on image to open in new tab</p>
                     </div>
                     
-                    <div class="info">
+                    <div class=\"info\">
                         <h3>Bucket Information:</h3>
                         <p><strong>Bucket Name:</strong> ${yandex_storage_bucket.student_bucket.bucket}</p>
                         <p><strong>File Name:</strong> ${yandex_storage_object.website_image.key}</p>
@@ -147,20 +131,20 @@ resource "yandex_compute_instance_group" "lamp-group" {
                     
                     <h3>Useful Links:</h3>
                     <ul>
-                        <li><a href="/phpinfo.php">PHP Info</a></li>
-                        <li><a href="/phpmyadmin" target="_blank">phpMyAdmin (if installed)</a></li>
+                        <li><a href=\"/phpinfo.php\">PHP Info</a></li>
+                        <li><a href=\"/phpmyadmin\" target=\"_blank\">phpMyAdmin (if installed)</a></li>
                     </ul>
                     
-                    <div class="metadata">
+                    <div class=\"metadata\">
                         <h4>Instance Metadata:</h4>
                         <p>Generated: $(date)</p>
-                        <p>Internal IP: $(hostname -I | awk '{print $1}')</p>
+                        <p>Internal IP: $(hostname -I | awk '{print \$1}')</p>
                         <p>Public IP: $(curl -s ifconfig.me)</p>
                     </div>
                 </div>
             </body>
             </html>
-            EOL
+            EOL"
           - chown -R www-data:www-data /var/www/html/
           - chmod -R 755 /var/www/html/
           - systemctl restart apache2
@@ -188,12 +172,12 @@ resource "yandex_compute_instance_group" "lamp-group" {
   }
   
 
-  #   # === ДОБАВЬТЕ ЭТОТ БЛОК ===
-  load_balancer {
-    target_group_name        = "lamp-target-group" # Имя для автоматически создаваемой целевой группы
-    target_group_description = "Target group for LAMP instance group"
-  }
-  # # =========================
+  # #   # === ДОБАВЬТЕ ЭТОТ БЛОК ===
+  # load_balancer {
+  #   target_group_name        = "lamp-target-group" # Имя для автоматически создаваемой целевой группы
+  #   target_group_description = "Target group for LAMP instance group"
+  # }
+  # # # =========================
 
 
   # Настройка проверки состояния

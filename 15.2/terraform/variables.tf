@@ -49,3 +49,6 @@ variable "zone" {
   default     = "ru-central1-a"
 }
 
+# variable "public_subnet_id" {
+#   description = "ID публичной подсети"
+# }
