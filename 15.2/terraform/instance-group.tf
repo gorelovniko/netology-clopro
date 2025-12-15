@@ -6,7 +6,8 @@ resource "yandex_compute_instance_group" "lamp_group" {
   
   instance_template {
     platform_id = "standard-v3"
-    
+    # service_account_id = yandex_iam_service_account.vm-sa.id
+
     resources {
       memory = 2
       cores  = 2
@@ -181,6 +182,8 @@ resource "yandex_compute_instance_group" "lamp_group" {
   }
   
   depends_on = [
+    yandex_iam_service_account.vm-sa,  # Убедитесь, что SA создан первым
+    yandex_resourcemanager_folder_iam_member.vm-editor,  # И права назначены
     yandex_storage_object.website_image,
     yandex_vpc_subnet.subnet_a
   ]
