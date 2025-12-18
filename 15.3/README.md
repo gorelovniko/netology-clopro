@@ -7,24 +7,24 @@
 
 [s3](./terraform/s3.tf)
 
-![](./img/1.png)
+![](./img/1.PNG)
 
-![](./img/2.png)
+![](./img/2.PNG)
 
-![](./img/3.png)
+![](./img/3.PNG)
 
 ---
 
 2. Создаем статический сайт в Object Storage c собственным публичным адресом и сделаем доступным по HTTPS:
 
-![](./img/4.png)  
-![](./img/5.png)  
-![](./img/6.png)  
-![](./img/7.png)  
-![](./img/8.png)  
-![](./img/9.png)  
-![](./img/10.png)  
-![](./img/11.png)  
-![](./img/12.png)  
+![](./img/4.PNG)  
+![](./img/5.PNG)  
+![](./img/6.PNG)  
+![](./img/7.PNG)  
+![](./img/8.PNG)  
+![](./img/9.PNG)  
+![](./img/10.PNG)  
+![](./img/11.PNG)  
+![](./img/12.PNG)  
 
 ---
